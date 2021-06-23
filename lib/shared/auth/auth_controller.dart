@@ -3,7 +3,6 @@ import 'package:payflow/shared/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController {
-  bool _isAuthenticated = false;
   UserModel? _user;
 
   UserModel get user => _user!;
@@ -11,11 +10,9 @@ class AuthController {
   void setUser(BuildContext context, UserModel? user) {
     if (user != null) {
       _user = user;
-      _isAuthenticated = true;
 
       Navigator.pushReplacementNamed(context, "/home");
     } else {
-      _isAuthenticated = false;
       Navigator.pushReplacementNamed(context, "/login");
     }
   }
@@ -31,8 +28,12 @@ class AuthController {
   Future<void> currentUser(BuildContext context) async {
     final instance = await SharedPreferences.getInstance();
 
-    final json = instance.get("user") as String;
-    setUser(context, UserModel.fromJson(json));
+    if (instance.containsKey("user")) {
+      final json = instance.get("user") as String;
+      setUser(context, UserModel.fromJson(json));
+    } else {
+      setUser(context, null);
+    }
 
     return;
   }
